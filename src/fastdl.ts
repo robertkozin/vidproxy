@@ -16,8 +16,8 @@ export async function fastdl(page: Page, target: URL): Promise<string[]> {
   let { promise, resolve, reject } = Promise.withResolvers<string[]>();
 
   setTimeout(() => {
-    reject("timeout 10s");
-  }, 10_000);
+    reject("timeout 15s");
+  }, 15_000);
 
   page.on(
     "request",

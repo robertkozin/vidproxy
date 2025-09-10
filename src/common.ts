@@ -1,18 +1,11 @@
 import { HTTPRequest, type Handler } from "puppeteer";
 
-interface MediaItem {
-  url: string;
-}
+export const toUrls = (urls: string[]): { remote_urls: string[] } => ({
+  remote_urls: urls,
+});
 
-interface GeneralError {
-  error_msg: string;
-  error_debug: Record<string, any>;
-}
-
-type MediaResponse = { media: MediaItem[] } | GeneralError;
-
-export const toMedia = (urls: string[]): { media: MediaItem[] } => ({
-  media: urls.map((url) => ({ url })),
+export const toError = (msg: string): { msg: string } => ({
+  msg: msg,
 });
 
 export const filterCriticalFirstPartyRequestsForDomain = (

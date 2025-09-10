@@ -7,7 +7,13 @@ export const targetMiddleware = createMiddleware<{
     target: URL;
   };
 }>(async (c, next) => {
-  const targetParam = c.req.query("target");
+  let targetParam: string | undefined;
+  if (c.req.method == "GET") {
+    targetParam = c.req.query("target");
+  } else if (c.req.method == "POST") {
+    targetParam = await c.req.json().then((body) => body.target);
+  }
+
   if (!targetParam) {
     return c.json({ msg: "expecting target param" }, 400);
   }
@@ -15,6 +21,7 @@ export const targetMiddleware = createMiddleware<{
   if (!targetUrl) {
     return c.json({ msg: "parsing target param as url" }, 400);
   }
+
   c.set("target", targetUrl);
   await next();
 });
