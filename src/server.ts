@@ -41,13 +41,13 @@ Bun.serve({
     "/extract": {
       POST: extractHandler,
     },
-    "/bench": (req) => {
+    "/bench": async (req) => {
       console.time("local");
-      local();
+      await local();
       console.timeEnd("local");
 
       console.time("remote");
-      remote();
+      await remote();
       console.time("remote");
 
       return new Response("OK");
