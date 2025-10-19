@@ -1,6 +1,7 @@
 import { fastdl } from "./extractors/fastdl";
 import type { Page } from "puppeteer";
 import { getPage } from "./browser";
+import puppeteer from "puppeteer-core";
 
 const error = (error: string, status: number = 400) =>
   Response.json({ error }, { status });
@@ -50,6 +51,10 @@ Bun.serve({
       await remote();
       console.timeEnd("remote");
 
+      console.time("remotews");
+      await remotews();
+      console.timeEnd("remotews");
+
       return new Response("OK");
     },
   },
@@ -57,6 +62,15 @@ Bun.serve({
 
 async function local() {
   let page = await getPage();
+  await page.goto("https://example.com");
+  return true;
+}
+
+async function remotews() {
+  let browser = await puppeteer.connect({
+    browserWSEndpoint: "http://browser:3000",
+  });
+  let page = await browser.newPage();
   await page.goto("https://example.com");
   return true;
 }
