@@ -48,7 +48,7 @@ Bun.serve({
 
       console.time("remote");
       await remote();
-      console.time("remote");
+      console.timeEnd("remote");
 
       return new Response("OK");
     },
