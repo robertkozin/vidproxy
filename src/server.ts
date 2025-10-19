@@ -1,7 +1,6 @@
 import { fastdl } from "./extractors/fastdl";
 import type { Page } from "puppeteer";
 import { getPage } from "./browser";
-import { validator } from "hono/validator";
 
 const error = (error: string, status: number = 400) =>
   Response.json({ error }, { status });
@@ -38,7 +37,7 @@ const extractHandler = async (req: Request): Promise<Response> => {
 
 Bun.serve({
   routes: {
-    "/": new Response(await Bun.file("index.html").bytes()),
+    "/": new Response(await Bun.file("src/index.html").bytes()),
     "/extract": {
       POST: extractHandler,
     },
