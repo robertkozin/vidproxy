@@ -2,14 +2,6 @@ import { type HTTPResponse } from "puppeteer";
 import * as common from "./common";
 import type { Page } from "puppeteer";
 
-function findBestURL(m: MediaURL[]): string {
-  if (!m || m.length === 0) {
-    return "";
-  }
-
-  return m?.[0]?.url ?? "";
-}
-
 export async function fastdl(page: Page, target: URL): Promise<string[]> {
   await page.setRequestInterception(true);
 
@@ -62,6 +54,14 @@ export async function fastdl(page: Page, target: URL): Promise<string[]> {
   await page.click('form button[type="submit"]');
 
   return promise;
+}
+
+function findBestURL(m: MediaURL[]): string {
+  if (!m || m.length === 0) {
+    return "";
+  }
+
+  return m?.[0]?.url ?? "";
 }
 
 // Base media item structure

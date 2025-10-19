@@ -1,0 +1,46 @@
+import { fastdl } from "./extractors/fastdl";
+import type { Page } from "puppeteer";
+import { getPage } from "./browser";
+import { validator } from "hono/validator";
+
+const error = (error: string, status: number = 400) =>
+  Response.json({ error }, { status });
+
+type Extractor = (page: Page, target: URL) => Promise<string[]>;
+
+let extractors: Map<string, Extractor> = new Map();
+extractors.set("fastdl", fastdl);
+
+const extractHandler = async (req: Request): Promise<Response> => {
+  const v: any = await req.json();
+
+  if (!v.target || typeof v.target !== "string") return error("missing target");
+  if (!v.extractor || typeof v.extractor !== "string")
+    return error("missing extractor");
+
+  const target = URL.parse(v.target);
+  if (!target) return error(`could not parse target as url: ${v.target}`);
+
+  const extractor = extractors.get(v.extractor);
+  if (!extractor) return error(`extractor not found: ${v.extractor}`, 404);
+
+  const page = await getPage();
+
+  try {
+    const urls = await extractor(page, target);
+    return Response.json({ remote_urls: urls });
+  } catch (err) {
+    return error(String(err), 500);
+  } finally {
+    page.close();
+  }
+};
+
+Bun.serve({
+  routes: {
+    "/": new Response(await Bun.file("index.html").bytes()),
+    "/extract": {
+      POST: extractHandler,
+    },
+  },
+});

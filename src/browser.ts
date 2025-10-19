@@ -5,7 +5,7 @@ const isDev = process.env.NODE_ENV !== "production";
 const browser = await puppeteer.launch({
   headless: !isDev,
   executablePath: isDev ? undefined : "/usr/bin/google-chrome",
-  args: isDev 
+  args: isDev
     ? ["--disable-images"]
     : ["--disable-images", "--no-sandbox", "--disable-setuid-sandbox"],
 });

@@ -1,0 +1,85 @@
+<!doctype html>
+<html>
+  <head lang="en">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>browser vid extract</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css"
+    />
+    <style>
+      [hidden] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>browser vid extract</h1>
+    <form id="$form">
+      <input name="extractor" required placeholder="extractor" />
+      <input type="url" name="target" required placeholder="target" />
+      <button type="submit">extract</button>
+    </form>
+
+    <div id="$loading" hidden>
+      <p>Loading...</p>
+    </div>
+
+    <div id="$result" hidden>
+      <h2>Result</h2>
+      <ul id="urlList" class="url-list"></ul>
+    </div>
+
+    <div id="$error" hidden>
+      <h2>Error</h2>
+      <code><pre></pre></code>
+    </div>
+
+    <script>
+      window.$form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        window.$loading.hidden = true;
+        window.$result.hidden = true;
+        window.$error.hidden = true;
+
+        const extractor = document.getElementById("extractor").value;
+        const target = encodeURIComponent(
+          document.getElementById("target").value,
+        );
+
+        try {
+          const response = await fetch(
+            "/extract/" + extractor + "?target=" + target,
+          );
+          const data = await response.json();
+
+          loading.style.display = "none";
+
+          if (response.ok && data.urls) {
+            // Show results
+            urlList.innerHTML = data.urls
+              .map(
+                (url) =>
+                  \`<li><a href="\${url}" target="_blank">\${url}</a></li>\`,
+              )
+              .join("");
+            results.style.display = "block";
+          } else {
+            // Show error
+            error.textContent = data.msg || "An error occurred";
+            error.style.display = "block";
+          }
+        } catch (err) {
+          loading.style.display = "none";
+          error.textContent = "Network error: " + err.message;
+          error.style.display = "block";
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Extract URLs";
+          });
+    </script>
+  </body>
+</html>
