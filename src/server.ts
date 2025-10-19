@@ -42,5 +42,40 @@ Bun.serve({
     "/extract": {
       POST: extractHandler,
     },
+    "/bench": (req) => {
+      console.time("local");
+      local();
+      console.timeEnd("local");
+
+      console.time("remote");
+      remote();
+      console.time("remote");
+
+      return new Response("OK");
+    },
   },
 });
+
+async function local() {
+  let page = await getPage();
+  await page.goto("https://example.com");
+  return true;
+}
+
+async function remote() {
+  const response = await fetch("http://browser:3000/function", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      code: `
+        export default async function({ page }) {
+          await page.goto('https://example.com');
+          return { success: true };
+        }
+      `,
+      context: {},
+    }),
+  });
+}
